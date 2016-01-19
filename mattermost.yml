@@ -1,0 +1,36 @@
+- hosts: all
+  sudo: yes
+  remote_user: ubuntu
+
+  tasks:
+    - name: Download the latest Mattermost Server
+      get_url: url=https://github.com/mattermost/platform/releases/download/v1.3.0/mattermost.tar.gz
+               dest=/home/ubuntu/mattermost.tar.gz
+
+    - name: Unzip the Mattermost Server
+      command: tar -xvzf mattermost.tar.gz
+
+    - command: chown -R ubuntu /home/ubuntu/mattermost
+      sudo: yes
+
+    - name: Create the storage directory for files
+      command: mkdir -p /mattermost/data
+      sudo: yes
+
+    - name: Set the ubuntu account as the directory owner
+      command: chown -R ubuntu /mattermost
+      sudo: yes
+
+    - name: Configure Mattermost Server
+      copy: src=config.json
+            dest=/home/ubuntu/mattermost/config/config.json
+            mode=0644
+
+    - name: Setup Mattermost to use the Upstart daemon
+      copy: src=mattermost.conf
+            dest=/etc/init/mattermost.conf
+
+    - name: Start Mattermost Server
+      command: start mattermost
+      sudo: yes
+

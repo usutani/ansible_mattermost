@@ -1,0 +1,66 @@
+- hosts: all
+  sudo: yes
+  remote_user: ubuntu
+  vars:
+    dbuser: "mmuser"
+    dbpass: "mmuser_password"
+    dbname: "mattermost"
+
+  tasks:
+    - name: Install postgresql
+      apt: pkg={{ item }} state=installed
+      with_items: 
+        - postgresql
+        - postgresql-contrib
+        - python-psycopg2
+
+#  - name: postgresql initdb
+#    shell: service postgresql initdb
+
+#  - name: start postgresql
+#    service: name=postgresql state=started  enabled=yes
+
+#  - name: postgres user sudores
+#    lineinfile: 
+#      dest: /etc/sudoers.d/postgres 
+#      owner: root
+#      group: root
+#      mode: 0440
+#      line: "%vagrant ALL=(postgres) NOPASSWD: ALL"
+#      state: present
+#      create: yes
+#      validate: "visudo -cf %s"
+
+    - name : create database
+      postgresql_db: 
+        name: "{{ dbname }}"
+        encoding: "UTF-8"
+        login_user: postgres
+      sudo_user: postgres
+      sudo: yes
+
+    - name: create user
+      postgresql_user: 
+        db: "{{ dbname }}"
+        name: "{{ dbuser }}"
+        password: "{{ dbpass }}"
+        priv: ALL
+        state: present
+        login_user: postgres
+      sudo_user: postgres
+      sudo: yes
+
+#    - name: Allow Postgres to listen on all assigned IP Addresses
+#      lineinfile:
+#        dest: /etc/postgresql/9.3/main/postgresql.conf
+#        state: present
+#        regexp: '^#listen_addresses'
+#        line: "listen_addresses = '*'"
+#      sudo: yes
+
+# sudo vi /etc/postgresql/9.3/main/pg_hba.conf
+
+    - name: Reload Postgres database
+      command: /etc/init.d/postgresql reload
+      sudo: yes
+

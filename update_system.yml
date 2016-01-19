@@ -1,0 +1,7 @@
+- hosts: all
+  sudo: yes
+  remote_user: ubuntu
+  tasks:
+    - name: Make sure the system is up to date
+      apt: upgrade=dist
+      apt: update_cache=yes

@@ -1,0 +1,31 @@
+- hosts: all
+  sudo: yes
+  remote_user: ubuntu
+  vars:
+    config_file: "mattermost_ssl"
+
+  tasks:
+    - name: Install Nginx
+      apt: pkg=nginx state=installed
+
+    - name: Configure Nginx to proxy
+      template: src={{ config_file }}
+                dest=/etc/nginx/sites-available/mattermost
+                mode=0644
+                force=yes
+
+    - name: Remove the existing default file
+      file: path=/etc/nginx/sites-enabled/default
+            state=absent
+
+    - name: Link the mattermost config
+      file: path=/etc/nginx/sites-enabled/mattermost
+            src=/etc/nginx/sites-available/mattermost
+            state=link
+            force=yes
+      sudo: yes
+
+    - name: Restart Nginx
+      command: service nginx restart
+      sudo: yes
+

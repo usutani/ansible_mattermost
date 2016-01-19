@@ -6,6 +6,5 @@
 - include: update_system.yml
 - include: postgresql.yml
 - include: mattermost.yml
-- include: letsencrypt.yml
 - include: nginx.yml
 

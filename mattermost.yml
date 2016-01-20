@@ -1,10 +1,12 @@
 - hosts: all
   sudo: yes
   remote_user: ubuntu
+  vars:
+    version: v1.4.0
 
   tasks:
     - name: Download the latest Mattermost Server
-      get_url: url=https://github.com/mattermost/platform/releases/download/v1.3.0/mattermost.tar.gz
+      get_url: url=https://github.com/mattermost/platform/releases/download/{{ version }}/mattermost.tar.gz
                dest=/home/ubuntu/mattermost.tar.gz
 
     - name: Unzip the Mattermost Server
